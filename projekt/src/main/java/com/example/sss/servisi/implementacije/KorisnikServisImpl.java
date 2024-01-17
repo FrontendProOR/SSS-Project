@@ -6,8 +6,12 @@ import com.example.sss.model.enumRole;
 import com.example.sss.repozitorijumi.KorisnikRepozitorijum;
 import com.example.sss.servisi.KorisnikServis;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,9 +47,26 @@ public class KorisnikServisImpl implements KorisnikServis {
         System.out.println("ASHDASDASDHKJSADHA");
         novi.setRole(enumRole.valueOf(korisnikDTO.getUloga().toUpperCase()));
 
+        String jwtToken = generateJwtToken(novi);
+        novi.setToken(jwtToken);
+
         novi = korisnikRepozitorijum.save(novi);
 
         return novi;
     }
 
+    @Value("${jwt.secretKey}")
+    private String jwtSecretKey;
+
+    // JWT token metod
+    private String generateJwtToken(Korisnik korisnik) {
+        long expirationTime = 180000;
+
+        return Jwts.builder()
+                .setSubject(korisnik.getEmail())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(SignatureAlgorithm.HS512, jwtSecretKey)
+                .compact();
+    }
 }

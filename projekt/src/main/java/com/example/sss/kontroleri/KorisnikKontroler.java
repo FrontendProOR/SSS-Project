@@ -22,14 +22,15 @@ public class KorisnikKontroler {
     public ResponseEntity<KorisnikDTO> create(@RequestBody @Validated KorisnikDTO noviKorisnik){
 
         for (int m = 0; m < 10; m++) {
-            System.out.println("Hello world registracija");
+            System.out.println("!!!!!!!!!!!!!!!!");
         }
+
         System.out.println(noviKorisnik.getEmail() + noviKorisnik.getUloga() + noviKorisnik.getAdresa());
         Korisnik kreirani = korisnikServis.createUser(noviKorisnik);
         System.out.println(kreirani);
 
         for (int m = 0; m < 10; m++) {
-            System.out.println("Hello world registracija");
+            System.out.println("!!!!!!!!!!!!!!!!");
         }
 
         if(kreirani == null){
