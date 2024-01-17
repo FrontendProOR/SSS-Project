@@ -15,7 +15,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NekretninaDTO {
-    public Integer id;
+    
+
+	public Integer id;
     public String lokacija;
     public double povrsina;
     public double cena;
@@ -31,4 +33,64 @@ public class NekretninaDTO {
     	this.tip = nekretnina.getTip();
     	this.korisnik = nekretnina.getKorisnik();
     }
+    
+    public NekretninaDTO() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setLokacija(String lokacija) {
+		this.lokacija = lokacija;
+	}
+
+	public void setPovrsina(double povrsina) {
+		this.povrsina = povrsina;
+	}
+
+	public void setCena(double cena) {
+		this.cena = cena;
+	}
+
+	public void setProdajaIzdavanje(enumProdajaIzdavanje prodajaIzdavanje) {
+		this.prodajaIzdavanje = prodajaIzdavanje;
+	}
+
+	public void setTip(enumTip tip) {
+		this.tip = tip;
+	}
+
+	public void setKorisnik(Korisnik korisnik) {
+		this.korisnik = korisnik;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public String getLokacija() {
+		return lokacija;
+	}
+
+	public double getPovrsina() {
+		return povrsina;
+	}
+
+	public double getCena() {
+		return cena;
+	}
+
+	public enumProdajaIzdavanje getProdajaIzdavanje() {
+		return prodajaIzdavanje;
+	}
+
+	public enumTip getTip() {
+		return tip;
+	}
+
+	public Korisnik getKorisnik() {
+		return korisnik;
+	}
 }

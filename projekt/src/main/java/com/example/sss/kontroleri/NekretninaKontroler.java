@@ -1,5 +1,6 @@
 package com.example.sss.kontroleri;
 
+import com.example.sss.model.DTO.KorisnikDTO;
 import com.example.sss.model.DTO.NekretninaDTO;
 import com.example.sss.model.Nekretnina;
 import com.example.sss.servisi.KorisnikServis;
@@ -32,9 +33,12 @@ public class NekretninaKontroler {
             nekretninaDTO.setLokacija(nekretnina.getLokacija());
             nekretninaDTO.setPovrsina(nekretnina.getPovrsina());
             nekretninaDTO.setCena(nekretnina.getCena());
-            nekretninaDTO.setProdajaIzdavanje(String.valueOf(nekretnina.getProdajaIzdavanje()));
-            nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
-            nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
+            nekretninaDTO.setProdajaIzdavanje(nekretnina.getProdajaIzdavanje());
+            nekretninaDTO.setTip(nekretnina.getTip());
+            nekretninaDTO.setKorisnik(nekretnina.getKorisnik());
+//            nekretninaDTO.setProdajaIzdavanje(String.valueOf(nekretnina.getProdajaIzdavanje()));
+//            nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
+//            nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
             System.out.println(nekretninaDTO.getCena());
             nekretnineDTOi.add(nekretninaDTO);
         }
