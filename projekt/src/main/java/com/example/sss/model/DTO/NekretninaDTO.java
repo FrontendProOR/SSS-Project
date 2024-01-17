@@ -15,7 +15,7 @@ public class NekretninaDTO {
     public String lokacija;
     public double povrsina;
     public double cena;
-    public String prodajaIzdaja;
+    public String prodajaIzdavanje;
     public String tip;
     public String korisnik;
 }

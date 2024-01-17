@@ -32,7 +32,7 @@ public class Nekretnina {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private enumProdajaIzdaja prodajaIzdaja;
+    private enumProdajaIzdavanje prodajaIzdavanje;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

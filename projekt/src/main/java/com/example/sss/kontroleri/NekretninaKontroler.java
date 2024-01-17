@@ -32,7 +32,7 @@ public class NekretninaKontroler {
             nekretninaDTO.setLokacija(nekretnina.getLokacija());
             nekretninaDTO.setPovrsina(nekretnina.getPovrsina());
             nekretninaDTO.setCena(nekretnina.getCena());
-            nekretninaDTO.setProdajaIzdaja(String.valueOf(nekretnina.getProdajaIzdaja()));
+            nekretninaDTO.setProdajaIzdavanje(String.valueOf(nekretnina.getProdajaIzdavanje()));
             nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
             nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
             System.out.println(nekretninaDTO.getCena());
