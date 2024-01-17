@@ -1,9 +1,7 @@
 package com.example.sss.kontroleri;
 
-import com.example.sss.model.DTO.KorisnikDTO;
 import com.example.sss.model.DTO.NekretninaDTO;
 import com.example.sss.model.Nekretnina;
-import com.example.sss.servisi.KorisnikServis;
 import com.example.sss.servisi.NekretninaServis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

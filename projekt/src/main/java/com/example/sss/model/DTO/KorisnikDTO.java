@@ -3,13 +3,10 @@ package com.example.sss.model.DTO;
 import com.example.sss.model.Korisnik;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.util.List;
 
+//@Setter
+//@Getter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -1,8 +1,6 @@
 package com.example.sss.servisi.implementacije;
 
-import com.example.sss.model.Korisnik;
 import com.example.sss.model.Nekretnina;
-import com.example.sss.repozitorijumi.KorisnikRepozitorijum;
 import com.example.sss.repozitorijumi.NekretninaRepozitorijum;
 import com.example.sss.servisi.NekretninaServis;
 import org.springframework.beans.factory.annotation.Autowired;

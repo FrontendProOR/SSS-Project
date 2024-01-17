@@ -1,18 +1,14 @@
 package com.example.sss.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.Data;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+//@Getter
+//@Setter
+@Data
 @Table(name = "korisnici")
 public class Korisnik {
     

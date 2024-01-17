@@ -6,12 +6,12 @@ import com.example.sss.model.enumProdajaIzdavanje;
 import com.example.sss.model.enumTip;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+//@Getter
+//@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class NekretninaDTO {

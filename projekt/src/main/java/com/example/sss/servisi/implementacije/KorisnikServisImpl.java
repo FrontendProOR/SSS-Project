@@ -59,7 +59,8 @@ public class KorisnikServisImpl implements KorisnikServis {
     private String jwtSecretKey;
 
     // JWT token metod
-    private String generateJwtToken(Korisnik korisnik) {
+    @SuppressWarnings("deprecation")
+	private String generateJwtToken(Korisnik korisnik) {
         long expirationTime = 180000;
 
         return Jwts.builder()
