@@ -59,8 +59,14 @@ public class KorisnikKontroler {
         Korisnik korisnik = korisnikRepozitorijum.findByEmail(kredencijali.getEmail());
 
         if(korisnik != null){
-            String token = tokenUtils.generateJwtToken(korisnik);
-            return ResponseEntity.ok(new KorisnickiToken(token));
+            if (kredencijali.getPassword().equals(korisnik.getPassword())) {
+                String token = tokenUtils.generateJwtToken(korisnik);
+                return ResponseEntity.ok(new KorisnickiToken(token));
+            }
+            else
+            {
+                return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+            }
         }
         else
         {
