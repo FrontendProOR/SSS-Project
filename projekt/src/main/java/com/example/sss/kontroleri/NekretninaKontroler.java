@@ -2,6 +2,7 @@ package com.example.sss.kontroleri;
 
 import com.example.sss.model.DTO.NekretninaDTO;
 import com.example.sss.model.Nekretnina;
+import com.example.sss.servisi.KorisnikServis;
 import com.example.sss.servisi.NekretninaServis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +32,9 @@ public class NekretninaKontroler {
             nekretninaDTO.setLokacija(nekretnina.getLokacija());
             nekretninaDTO.setPovrsina(nekretnina.getPovrsina());
             nekretninaDTO.setCena(nekretnina.getCena());
-            nekretninaDTO.setProdajaIzdavanje(nekretnina.getProdajaIzdavanje());
-            nekretninaDTO.setTip(nekretnina.getTip());
-            nekretninaDTO.setKorisnik(nekretnina.getKorisnik());
-//            nekretninaDTO.setProdajaIzdavanje(String.valueOf(nekretnina.getProdajaIzdavanje()));
-//            nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
-//            nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
+            nekretninaDTO.setProdajaIzdaja(String.valueOf(nekretnina.getProdajaIzdaja()));
+            nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
+            nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
             System.out.println(nekretninaDTO.getCena());
             nekretnineDTOi.add(nekretninaDTO);
         }

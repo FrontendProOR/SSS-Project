@@ -9,6 +9,7 @@ import java.util.Optional;
 @RestController
 public interface KorisnikRepozitorijum extends JpaRepository<Korisnik, Long> {
 
-    Korisnik findByEmail(Korisnik korisnik);
+    Korisnik findByEmail(String email);
     Optional<Korisnik> findFirstByEmail(String email);
+    Optional<Korisnik> findFirstByNumTel(String numtel);
 }

@@ -36,6 +36,12 @@ public class KorisnikServisImpl implements KorisnikServis {
         if(korisnik.isPresent()){
             return null;
         }
+        korisnik = korisnikRepozitorijum.findFirstByNumTel(korisnikDTO.getBrojTelefona());
+
+        if(korisnik.isPresent()){
+            return null;
+        }
+
         System.out.println("GUGUGGUGUGUGU");
         Korisnik novi = new Korisnik();
         novi.setEmail(korisnikDTO.getEmail());
@@ -46,28 +52,11 @@ public class KorisnikServisImpl implements KorisnikServis {
         novi.setAddress(korisnikDTO.getAdresa());
         System.out.println("ASHDASDASDHKJSADHA");
         novi.setRole(enumRole.valueOf(korisnikDTO.getUloga().toUpperCase()));
-
-        String jwtToken = generateJwtToken(novi);
-        novi.setToken(jwtToken);
+        novi.setActive(true);
 
         novi = korisnikRepozitorijum.save(novi);
 
         return novi;
     }
 
-    @Value("${jwt.secretKey}")
-    private String jwtSecretKey;
-
-    // JWT token metod
-    @SuppressWarnings("deprecation")
-	private String generateJwtToken(Korisnik korisnik) {
-        long expirationTime = 180000;
-
-        return Jwts.builder()
-                .setSubject(korisnik.getEmail())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS512, jwtSecretKey)
-                .compact();
-    }
 }

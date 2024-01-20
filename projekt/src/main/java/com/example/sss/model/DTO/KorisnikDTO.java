@@ -2,48 +2,18 @@ package com.example.sss.model.DTO;
 
 import com.example.sss.model.Korisnik;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-//@Setter
-//@Getter
-@Data
+import java.util.List;
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class KorisnikDTO {
-    public Integer getId() {
-		return id;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public String getBrojTelefona() {
-		return brojTelefona;
-	}
-
-	public String getAdresa() {
-		return adresa;
-	}
-
-	public String getUloga() {
-		return uloga;
-	}
-
-	public Integer id;
+    public Integer id;
     public String email;
     public String password;
     public String firstName;
@@ -51,6 +21,7 @@ public class KorisnikDTO {
     public String brojTelefona;
     public String adresa;
     public String uloga;
+    public boolean aktivan;
 
     public KorisnikDTO(Korisnik kreirani) {
         this.email = kreirani.getEmail();
@@ -60,5 +31,6 @@ public class KorisnikDTO {
         this.brojTelefona = kreirani.getNumTel();
         this.adresa = kreirani.getAddress();
         this.uloga = String.valueOf(kreirani.getRole());
+        this.aktivan = true;
     }
 }

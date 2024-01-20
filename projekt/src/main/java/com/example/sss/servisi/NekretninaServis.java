@@ -1,5 +1,6 @@
 package com.example.sss.servisi;
 
+import com.example.sss.model.Korisnik;
 import com.example.sss.model.Nekretnina;
 
 import java.util.List;
