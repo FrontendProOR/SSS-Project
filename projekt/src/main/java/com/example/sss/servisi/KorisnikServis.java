@@ -9,5 +9,6 @@ public interface KorisnikServis {
 
     List<Korisnik> getAll();
     Korisnik createUser(KorisnikDTO korisnikDTO);
+    Korisnik createAgent(KorisnikDTO korisnikDTO, Korisnik vlasnik);
 
 }

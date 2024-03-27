@@ -77,7 +77,7 @@ public class KorisnikKontroler {
                 if (korisnik.getRole() == enumRole.VLASNIK) {
                     System.out.println(noviKorisnik.getEmail() + noviKorisnik.getUloga() + noviKorisnik.getAdresa());
                     noviKorisnik.setUloga("AGENT");
-                    Korisnik kreirani = korisnikServis.createUser(noviKorisnik);
+                    Korisnik kreirani = korisnikServis.createAgent(noviKorisnik, korisnik);
                     System.out.println(kreirani);
 
                     for (int m = 0; m < 10; m++) {
