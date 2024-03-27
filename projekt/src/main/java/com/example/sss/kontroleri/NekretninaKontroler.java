@@ -29,6 +29,7 @@ public class NekretninaKontroler {
 
         for (Nekretnina nekretnina : nekretnine) {
             NekretninaDTO nekretninaDTO = new NekretninaDTO();
+            nekretninaDTO.setId(nekretnina.getId());
             nekretninaDTO.setLokacija(nekretnina.getLokacija());
             nekretninaDTO.setPovrsina(nekretnina.getPovrsina());
             nekretninaDTO.setCena(nekretnina.getCena());

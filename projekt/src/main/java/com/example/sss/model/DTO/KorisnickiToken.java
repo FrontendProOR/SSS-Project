@@ -11,4 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class KorisnickiToken {
     private String token;
+    private String uloga;
 }

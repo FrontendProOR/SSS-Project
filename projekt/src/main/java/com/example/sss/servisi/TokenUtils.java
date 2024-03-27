@@ -1,6 +1,7 @@
 package com.example.sss.servisi;
 
 import com.example.sss.model.Korisnik;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,7 @@ import java.util.Date;
 @Component
 public class TokenUtils {
 
-    @Value("${jwt.secretKey}")
+    @Value("${jwt.secretKey}") // Na?
     private String jwtSecretKey = "aB3xZ8q1kL9oP2yH6rT7iG4jN5sD0fE1cV9bM8uY3wX2aB3xZ8q1kL9oP2yH6rT7iG4jN5sD0fE1cV9bM8uY3wX2";
 
     // JWT token metod
@@ -29,4 +30,19 @@ public class TokenUtils {
                 .signWith(SignatureAlgorithm.HS512, jwtSecretKey)
                 .compact();
     }
+
+    public Claims getClaimsFromToken(String token) {
+        Claims claims;
+        try {
+            claims = Jwts.parser().setSigningKey(this.jwtSecretKey).parseClaimsJws(token).getBody();
+            System.out.println(claims.getExpiration());
+            System.out.println(claims.getSubject());
+            System.out.println("KKKKKKKKKKKKKKKKKKKKKKKKKK");
+        } catch (Exception e) {
+            claims = null;
+            System.out.println("KKKKKKKKKKKKKKKKKKKKKKKKKK");
+        }
+        return claims;
+    }
+
 }
