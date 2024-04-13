@@ -41,4 +41,7 @@ public class Nekretnina {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "korisnik_id")
     private Korisnik korisnik;
+
+    @Column(nullable = false)
+    private boolean active;
 }

@@ -144,7 +144,7 @@ public class KorisnikKontroler {
                     noviKorisnik.setUloga("VLASNIK");
 
                     if(agencijaRepozitorijum.findFirstByIme(agencija.getIme()) != null) {
-                        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
                     }
 
                     Korisnik kreirani = korisnikServis.createUser(noviKorisnik);
@@ -171,6 +171,49 @@ public class KorisnikKontroler {
                     vlasnikAgencijaNova.setOpis(agencija.getOpis());
 
                     return new ResponseEntity<>(vlasnikAgencijaNova, HttpStatus.CREATED);
+                }
+            }
+        }
+
+        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+
+    }
+
+    @PostMapping("registracijaadmina")
+    public ResponseEntity<KorisnikDTO> createadmin(@RequestBody @Validated KorisnikDTO noviKorisnik, @RequestHeader("authorization") String token){
+
+        for (int m = 0; m < 10; m++) {
+            System.out.println("!!!!!!!!!!!!!!!!");
+        }
+
+        String email = null;
+        try {
+            email = tokenUtils.getClaimsFromToken(token).getSubject();
+        }
+        catch (Exception ignored){
+
+        }
+
+        if(email != null) {
+            Korisnik korisnik = korisnikRepozitorijum.findByEmail(email);
+
+            if (korisnik != null) {
+                if (korisnik.getRole() == enumRole.ADMIN) {
+                    System.out.println(noviKorisnik.getEmail() + noviKorisnik.getUloga() + noviKorisnik.getAdresa());
+                    noviKorisnik.setUloga("ADMIN");
+                    Korisnik kreirani = korisnikServis.createUser(noviKorisnik);
+                    System.out.println(kreirani);
+
+                    for (int m = 0; m < 10; m++) {
+                        System.out.println(";;;;;;;;;;;;;;;;");
+                    }
+
+                    if (kreirani == null) {
+                        return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+                    }
+                    KorisnikDTO korisnikDTO = new KorisnikDTO(kreirani);
+
+                    return new ResponseEntity<>(korisnikDTO, HttpStatus.CREATED);
                 }
             }
         }

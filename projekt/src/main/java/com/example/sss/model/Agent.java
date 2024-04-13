@@ -19,9 +19,12 @@ public class Agent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column
+    @Column(nullable = false)
     private Integer vlasnik;
 
-    @Column
+    @Column(nullable = false)
     private Integer agent;
+
+    @Column(nullable = false)
+    private boolean active;
 }
