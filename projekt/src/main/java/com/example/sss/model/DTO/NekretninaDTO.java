@@ -18,4 +18,5 @@ public class NekretninaDTO {
     public String prodajaIzdaja;
     public String tip;
     public String korisnik;
+    public Integer brojPregleda;
 }

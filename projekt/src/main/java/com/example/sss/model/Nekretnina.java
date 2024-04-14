@@ -44,4 +44,7 @@ public class Nekretnina {
 
     @Column(nullable = false)
     private boolean active;
+
+    @Column(nullable = false)
+    private Integer brojPregleda;
 }

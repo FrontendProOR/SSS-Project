@@ -8,10 +8,18 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public interface AgentRepozitorijum extends JpaRepository<Agent, Long> {
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO agenti (vlasnik, agent) VALUES (:vlasnikId, :noviId)", nativeQuery = true)
+    @Query(value = "INSERT INTO agenti (vlasnik, agent, active) VALUES (:vlasnikId, :noviId, true)", nativeQuery = true)
     int insert(@Param("noviId") int noviId, @Param("vlasnikId") int vlasnikId);
+
+    @Query(value = "SELECT * FROM agenti WHERE agent = :id", nativeQuery = true)
+    Agent nadjivlasnika(@Param("id") int id);
+
+    @Query(value = "SELECT * FROM agenti WHERE vlasnik = :id", nativeQuery = true)
+    List<Agent> nadjiSveAgentePodVlasnikom(@Param("id") int id);
 }

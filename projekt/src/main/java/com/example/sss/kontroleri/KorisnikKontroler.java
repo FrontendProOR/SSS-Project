@@ -84,6 +84,7 @@ public class KorisnikKontroler {
                 if (korisnik.getRole() == enumRole.VLASNIK) {
                     System.out.println(noviKorisnik.getEmail() + noviKorisnik.getUloga() + noviKorisnik.getAdresa());
                     noviKorisnik.setUloga("AGENT");
+                    //sussy baka
                     Korisnik kreirani = korisnikServis.createAgent(noviKorisnik, korisnik);
                     System.out.println(kreirani);
 

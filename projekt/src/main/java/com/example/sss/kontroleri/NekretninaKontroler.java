@@ -4,6 +4,7 @@ import com.example.sss.model.*;
 import com.example.sss.model.DTO.KorisnikDTO;
 import com.example.sss.model.DTO.NekretninaDTO;
 import com.example.sss.model.DTO.TerminDTO;
+import com.example.sss.repozitorijumi.AgentRepozitorijum;
 import com.example.sss.repozitorijumi.KorisnikRepozitorijum;
 import com.example.sss.repozitorijumi.NekretninaRepozitorijum;
 import com.example.sss.repozitorijumi.TerminRepozitorijum;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/nekretnine")
@@ -38,30 +40,12 @@ public class NekretninaKontroler {
     KorisnikRepozitorijum korisnikRepozitorijum;
 
     @Autowired
+    AgentRepozitorijum agentRepozitorijum;
+
+    @Autowired
     TerminRepozitorijum terminRepozitorijum;
 
     TokenUtils tokenUtils = new TokenUtils();
-
-    @GetMapping("sve")
-    public ResponseEntity<List<NekretninaDTO>> getAllNekretnine() {
-        List<Nekretnina> nekretnine = nekretninaServis.getAll();
-        List<NekretninaDTO> nekretnineDTOi = new ArrayList<>();
-
-        for (Nekretnina nekretnina : nekretnine) {
-            NekretninaDTO nekretninaDTO = new NekretninaDTO();
-            nekretninaDTO.setId(nekretnina.getId());
-            nekretninaDTO.setLokacija(nekretnina.getLokacija());
-            nekretninaDTO.setPovrsina(nekretnina.getPovrsina());
-            nekretninaDTO.setCena(nekretnina.getCena());
-            nekretninaDTO.setProdajaIzdaja(String.valueOf(nekretnina.getProdajaIzdaja()));
-            nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
-            nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
-            System.out.println(nekretninaDTO.getCena());
-            nekretnineDTOi.add(nekretninaDTO);
-        }
-
-        return ResponseEntity.ok(nekretnineDTOi);
-    }
 
     @GetMapping("/pretraga")
     public ResponseEntity<List<NekretninaDTO>> pretraga(
@@ -192,11 +176,72 @@ public class NekretninaKontroler {
             nekretninaDTO.setProdajaIzdaja(String.valueOf(nekretnina.getProdajaIzdaja()));
             nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
             nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
+            nekretninaDTO.setBrojPregleda(nekretnina.getBrojPregleda());
             System.out.println(nekretninaDTO.getCena());
+            nekretninaRepozitorijum.povecajBrojPregleda(nekretnina.getId());
 
             return new ResponseEntity<>(nekretninaDTO, HttpStatus.OK);
         }
 
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/mojaagencija")
+    public ResponseEntity<List<NekretninaDTO>> getNekrenineMojeAgencije(@RequestHeader("authorization") String token) {
+
+        for (int m = 0; m < 10; m++) {
+            System.out.println("!!!!!!!!!!!!!!!!");
+        }
+
+        String email = null;
+        try {
+            email = tokenUtils.getClaimsFromToken(token).getSubject();
+        }
+        catch (Exception ignored){
+
+        }
+
+        if(email != null) {
+            Korisnik korisnik = korisnikRepozitorijum.findByEmail(email);
+
+            if (korisnik != null) {
+                if (korisnik.getRole() == enumRole.AGENT) {
+                    Agent vlasnik = agentRepozitorijum.nadjivlasnika(korisnik.getId());
+                    System.out.println(vlasnik.getAgent() + "pipan" + vlasnik.getVlasnik() + "BRUHIMICS");
+                    List<Agent> agentiPodVlasnikom = agentRepozitorijum.nadjiSveAgentePodVlasnikom(vlasnik.getVlasnik());
+                    for(Agent agent : agentiPodVlasnikom){
+                        System.out.println(agent.getAgent());
+                    }
+                    List<Integer> agentIds = agentiPodVlasnikom.stream()
+                            .map(Agent::getAgent)
+                            .collect(Collectors.toList());
+                    for(Integer ints : agentIds){
+                        System.out.println(ints);
+                    }
+                    List<Nekretnina> nekretnine = nekretninaRepozitorijum.nekretnineAgencije(agentIds);
+                    for(Nekretnina nekretnina : nekretnine) {
+                        System.out.println(nekretnina.getPovrsina());
+                    }
+                    List<NekretninaDTO> nekretnineDTOi = new ArrayList<>();
+
+                    for (Nekretnina nekretnina : nekretnine) {
+                        NekretninaDTO nekretninaDTO = new NekretninaDTO();
+                        nekretninaDTO.setId(nekretnina.getId());
+                        nekretninaDTO.setLokacija(nekretnina.getLokacija());
+                        nekretninaDTO.setPovrsina(nekretnina.getPovrsina());
+                        nekretninaDTO.setCena(nekretnina.getCena());
+                        nekretninaDTO.setProdajaIzdaja(String.valueOf(nekretnina.getProdajaIzdaja()));
+                        nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
+                        nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
+                        System.out.println(nekretninaDTO.getCena());
+                        nekretnineDTOi.add(nekretninaDTO);
+                    }
+
+                    return ResponseEntity.ok(nekretnineDTOi);
+                }
+            }
+        }
+
+        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
     }
 }
