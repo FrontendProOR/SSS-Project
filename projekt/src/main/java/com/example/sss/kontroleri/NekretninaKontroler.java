@@ -8,6 +8,8 @@ import com.example.sss.repozitorijumi.AgentRepozitorijum;
 import com.example.sss.repozitorijumi.KorisnikRepozitorijum;
 import com.example.sss.repozitorijumi.NekretninaRepozitorijum;
 import com.example.sss.repozitorijumi.TerminRepozitorijum;
+import com.example.sss.repozitorijumi.SlikaRepozitorijum;
+import com.example.sss.servisi.ImageUtils;
 import com.example.sss.servisi.KorisnikServis;
 import com.example.sss.servisi.NekretninaServis;
 import com.example.sss.servisi.TokenUtils;
@@ -17,12 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,7 +47,12 @@ public class NekretninaKontroler {
     @Autowired
     TerminRepozitorijum terminRepozitorijum;
 
+    @Autowired
+    SlikaRepozitorijum slikaRepozitorijum;
+
     TokenUtils tokenUtils = new TokenUtils();
+
+    ImageUtils imageUtils = new ImageUtils();
 
     @GetMapping("/pretraga")
     public ResponseEntity<List<NekretninaDTO>> pretraga(
@@ -97,6 +104,7 @@ public class NekretninaKontroler {
 
         System.out.println(lokacija + povrsina + cena + prodaja + tip);
         List<Nekretnina> nekretnine = nekretninaRepozitorijum.filter(lokacija, povrsina, cena, prodaja, tip);
+        Collections.reverse(nekretnine);
         List<NekretninaDTO> nekretnineDTOi = new ArrayList<>();
 
         for (Nekretnina nekretnina : nekretnine) {
@@ -178,6 +186,36 @@ public class NekretninaKontroler {
             nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
             nekretninaDTO.setBrojPregleda(nekretnina.getBrojPregleda());
             System.out.println(nekretninaDTO.getCena());
+
+            List<ImagePath> slikeUBase64 = slikaRepozitorijum.slikeNekretnine(nekretnina.getId());
+            for(ImagePath slika : slikeUBase64){
+                System.out.println(slika.getImagePath());
+            }
+            List<String> putanje = slikeUBase64.stream()
+                    .map(ImagePath::getImagePath)
+                    .collect(Collectors.toList());
+            for(String slika : putanje){
+                System.out.println(slika);
+            }
+
+            List<String> enkodiraneSlike = new ArrayList<>();
+            for(String slika : putanje){
+                File putanja = new File(slika);
+                try {
+                    byte[] imageData = Files.readAllBytes(putanja.toPath());
+                    String base64Slika = Base64.getEncoder().encodeToString(imageData);
+                    enkodiraneSlike.add(base64Slika);
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                    break;
+                }
+
+            }
+
+            nekretninaDTO.setSlikeUBase64(enkodiraneSlike);
+            //System.out.println(nekretninaDTO.getSlikeUBase64());
+
             nekretninaRepozitorijum.povecajBrojPregleda(nekretnina.getId());
 
             return new ResponseEntity<>(nekretninaDTO, HttpStatus.OK);
