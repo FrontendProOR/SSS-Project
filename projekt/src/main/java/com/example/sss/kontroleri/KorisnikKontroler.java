@@ -148,7 +148,9 @@ public class KorisnikKontroler {
                         return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
                     }
 
-                    Korisnik kreirani = korisnikServis.createUser(noviKorisnik);
+                    Korisnik vlasnik = new Korisnik();
+
+                    Korisnik kreirani = korisnikServis.createAgent(noviKorisnik, vlasnik);
                     System.out.println(kreirani);
 
                     for (int m = 0; m < 10; m++) {

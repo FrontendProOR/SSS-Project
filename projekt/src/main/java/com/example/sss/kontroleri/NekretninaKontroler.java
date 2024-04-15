@@ -346,8 +346,9 @@ public class NekretninaKontroler {
                     }
                     List<Nekretnina> nekretnine = nekretninaRepozitorijum.nekretnineAgencije(agentIds);
                     for(Nekretnina nekretnina : nekretnine) {
-                        System.out.println(nekretnina.getPovrsina());
+                        System.out.println(nekretnina.getId());
                     }
+                    Collections.reverse(nekretnine);
                     List<NekretninaDTO> nekretnineDTOi = new ArrayList<>();
 
                     for (Nekretnina nekretnina : nekretnine) {
@@ -359,6 +360,7 @@ public class NekretninaKontroler {
                         nekretninaDTO.setProdajaIzdaja(String.valueOf(nekretnina.getProdajaIzdaja()));
                         nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
                         nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
+                        nekretninaDTO.setBrojPregleda(nekretninaDTO.getBrojPregleda());
                         System.out.println(nekretninaDTO.getCena());
                         nekretnineDTOi.add(nekretninaDTO);
                     }

@@ -90,7 +90,12 @@ public class KorisnikServisImpl implements KorisnikServis {
         novi = korisnikRepozitorijum.save(novi);
         System.out.println(novi.getId());
         System.out.println(vlasnik.getId());
-        agentRepozitorijum.insert(novi.getId(), vlasnik.getId());
+        if (vlasnik.getId() != null) {
+            agentRepozitorijum.insert(novi.getId(), vlasnik.getId());
+        }
+        else {
+            agentRepozitorijum.insert(novi.getId(), novi.getId());
+        }
         System.out.println("]]]");
 
         return novi;
