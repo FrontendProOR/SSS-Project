@@ -14,12 +14,14 @@ import com.example.sss.servisi.KorisnikServis;
 import com.example.sss.servisi.NekretninaServis;
 import com.example.sss.servisi.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
@@ -53,6 +55,9 @@ public class NekretninaKontroler {
     TokenUtils tokenUtils = new TokenUtils();
 
     ImageUtils imageUtils = new ImageUtils();
+
+    @Value("${image.directory.path}")
+    private String putanja;
 
     @GetMapping("/pretraga")
     public ResponseEntity<List<NekretninaDTO>> pretraga(
@@ -116,6 +121,7 @@ public class NekretninaKontroler {
             nekretninaDTO.setProdajaIzdaja(String.valueOf(nekretnina.getProdajaIzdaja()));
             nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
             nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
+            nekretninaDTO.setBrojPregleda(nekretnina.getBrojPregleda());
             System.out.println(nekretninaDTO.getCena());
             nekretnineDTOi.add(nekretninaDTO);
         }
@@ -191,15 +197,24 @@ public class NekretninaKontroler {
             for(ImagePath slika : slikeUBase64){
                 System.out.println(slika.getImagePath());
             }
-            List<String> putanje = slikeUBase64.stream()
+            List<String> imenafajlova = slikeUBase64.stream()
                     .map(ImagePath::getImagePath)
                     .collect(Collectors.toList());
-            for(String slika : putanje){
+            for(String slika : imenafajlova){
+                System.out.println(slika);
+            }
+
+            List<String> potpuneputanje = new ArrayList<>();
+            for(String slika : imenafajlova){
+                potpuneputanje.add(putanja + slika);
+            }
+
+            for(String slika : potpuneputanje){
                 System.out.println(slika);
             }
 
             List<String> enkodiraneSlike = new ArrayList<>();
-            for(String slika : putanje){
+            for(String slika : potpuneputanje){
                 File putanja = new File(slika);
                 try {
                     byte[] imageData = Files.readAllBytes(putanja.toPath());
@@ -208,7 +223,6 @@ public class NekretninaKontroler {
                 }
                 catch (IOException e) {
                     e.printStackTrace();
-                    break;
                 }
 
             }
@@ -222,6 +236,74 @@ public class NekretninaKontroler {
         }
 
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/novanekretnina")
+    public ResponseEntity<NekretninaDTO> createNekretnina(@RequestBody @Validated NekretninaDTO nekretninaDTO, @RequestHeader("authorization") String token) {
+
+        for (int m = 0; m < 10; m++) {
+            System.out.println("!!!!!!!!!!!!!!!!");
+        }
+
+        String email = null;
+        try {
+            email = tokenUtils.getClaimsFromToken(token).getSubject();
+        }
+        catch (Exception ignored){
+
+        }
+
+        if(email != null) {
+            Korisnik korisnik = korisnikRepozitorijum.findByEmail(email);
+
+            if (korisnik != null) {
+                if (korisnik.getRole() == enumRole.AGENT || korisnik.getRole() == enumRole.VLASNIK) {
+
+                    try {
+                        enumTip.valueOf(nekretninaDTO.tip);
+                    }
+                    catch (Exception e) {
+                        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                    }
+                    try {
+                        enumProdajaIzdaja.valueOf(nekretninaDTO.prodajaIzdaja);
+                    }
+                    catch (Exception e) {
+                        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                    }
+
+                    nekretninaRepozitorijum.insert(nekretninaDTO.tip, nekretninaDTO.cena, nekretninaDTO.lokacija, nekretninaDTO.povrsina, nekretninaDTO.prodajaIzdaja, korisnik.getId());
+                    int id = nekretninaRepozitorijum.getLastInsertedId();
+
+                    for(String suiseiseki : nekretninaDTO.slikeUBase64) {
+                        try {
+                            byte[] imageBytes = Base64.getDecoder().decode(suiseiseki);
+
+                            String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                            StringBuilder sb = new StringBuilder(25);
+                            Random random = new Random();
+                            for (int i = 0; i < 25; i++) {
+                                int randomIndex = random.nextInt(characters.length());
+                                char randomChar = characters.charAt(randomIndex);
+                                sb.append(randomChar);
+                            }
+
+                            FileOutputStream outputStream = new FileOutputStream(putanja + sb.toString() + ".jpg");
+                            outputStream.write(imageBytes);
+                            outputStream.close();
+
+                            slikaRepozitorijum.insert(sb.toString() + ".jpg", id);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return new ResponseEntity<>(null, HttpStatus.OK);
+                }
+            }
+        }
+
+        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
     }
 
     @GetMapping("/mojaagencija")
@@ -243,10 +325,16 @@ public class NekretninaKontroler {
             Korisnik korisnik = korisnikRepozitorijum.findByEmail(email);
 
             if (korisnik != null) {
-                if (korisnik.getRole() == enumRole.AGENT) {
-                    Agent vlasnik = agentRepozitorijum.nadjivlasnika(korisnik.getId());
-                    System.out.println(vlasnik.getAgent() + "pipan" + vlasnik.getVlasnik() + "BRUHIMICS");
-                    List<Agent> agentiPodVlasnikom = agentRepozitorijum.nadjiSveAgentePodVlasnikom(vlasnik.getVlasnik());
+                if (korisnik.getRole() == enumRole.AGENT || korisnik.getRole() == enumRole.VLASNIK) {
+                    List<Agent> agentiPodVlasnikom;
+                    if (korisnik.getRole() == enumRole.AGENT) {
+                        Agent vlasnik = agentRepozitorijum.nadjivlasnika(korisnik.getId());
+                        System.out.println(vlasnik.getAgent() + "pipan" + vlasnik.getVlasnik() + "BRUHIMICS");
+                        agentiPodVlasnikom = agentRepozitorijum.nadjiSveAgentePodVlasnikom(vlasnik.getVlasnik());
+                    }
+                    else {
+                        agentiPodVlasnikom = agentRepozitorijum.nadjiSveAgentePodVlasnikom(korisnik.getId());
+                    }
                     for(Agent agent : agentiPodVlasnikom){
                         System.out.println(agent.getAgent());
                     }

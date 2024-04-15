@@ -2,6 +2,8 @@ package com.example.sss.repozitorijumi;
 
 import com.example.sss.model.Korisnik;
 import com.example.sss.model.Nekretnina;
+import com.example.sss.model.enumProdajaIzdaja;
+import com.example.sss.model.enumTip;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +29,12 @@ public interface NekretninaRepozitorijum extends JpaRepository<Nekretnina, Long>
     @Transactional
     @Query(value = "UPDATE nekretnine SET broj_pregleda = broj_pregleda + 1 WHERE id = :id", nativeQuery = true)
     void povecajBrojPregleda(@Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO nekretnine (tip, cena, lokacija, povrsina, prodaja_izdaja, korisnik_id, active, broj_pregleda) VALUES (:tip, :cena, :lokacija, :povrsina, :prodaja, :id, true, 0)", nativeQuery = true)
+    int insert(@Param("tip") String tip, @Param("cena") double cena, @Param("lokacija") String lokacija, @Param("povrsina") double povrsina, @Param("prodaja") String prodaja, @Param("id") int id);
+
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    int getLastInsertedId();
 }

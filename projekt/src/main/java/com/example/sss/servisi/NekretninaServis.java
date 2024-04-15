@@ -9,4 +9,6 @@ public interface NekretninaServis {
 
     List<Nekretnina> getAll();
 
+   // Nekretnina addNekretnina(String tip, double cena, String lokacija, double povrsina, String prodaja, int id);
+
 }
