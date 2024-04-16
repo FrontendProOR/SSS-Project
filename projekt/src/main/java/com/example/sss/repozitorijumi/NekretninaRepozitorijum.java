@@ -37,4 +37,7 @@ public interface NekretninaRepozitorijum extends JpaRepository<Nekretnina, Long>
 
     @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
     int getLastInsertedId();
+
+    @Query(value ="SELECT * FROM nekretnine WHERE korisnik_id = :id AND active = true", nativeQuery = true)
+    List<Nekretnina> nekretnineAgenta(@Param("id") int id);
 }

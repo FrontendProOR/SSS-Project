@@ -22,4 +22,5 @@ public class NekretninaDTO {
     public String korisnik;
     public Integer brojPregleda;
     public List<String> slikeUBase64;
+    public Boolean liked;
 }

@@ -1,6 +1,7 @@
 package com.example.sss.repozitorijumi;
 
 import com.example.sss.model.Agent;
+import com.example.sss.model.Nekretnina;
 import com.example.sss.model.Termin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Repository
 public interface TerminRepozitorijum extends JpaRepository<Termin, Long> {
@@ -21,4 +23,10 @@ public interface TerminRepozitorijum extends JpaRepository<Termin, Long> {
 
     @Query(value = "SELECT * FROM termini WHERE (korisnik_id = :korisnik_id AND nekretnina_id = :nekretnina_id AND active = true) OR (datum BETWEEN :datum1 AND :datum2 AND nekretnina_id = :nekretnina_id AND active = true) LIMIT 1;", nativeQuery = true)
     Termin termin(@Param("datum1") Date datum1, @Param("datum2") Date datum2, @Param("korisnik_id") int korisnik_id, @Param("nekretnina_id") int nekretnina_id);
+
+    @Query(value ="SELECT * FROM termini WHERE nekretnina_id IN :ids AND active = true", nativeQuery = true)
+    List<Termin> terminiAgenta(@Param("ids") List<Integer> ids);
+
+    @Query(value ="SELECT * FROM termini WHERE id = :id AND active = true LIMIT 1", nativeQuery = true)
+    Termin nadji(@Param("id") int id);
 }

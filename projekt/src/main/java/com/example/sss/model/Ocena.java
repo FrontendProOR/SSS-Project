@@ -1,38 +1,32 @@
 package com.example.sss.model;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "termini")
-public class Termin {
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "ocene")
+public class Ocena {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "korisnik_id")
     private Korisnik korisnik;
 
-    @Column(name = "datum")
-    private Date datum;
-
     @ManyToOne
     @JoinColumn(name = "nekretnina_id")
     private Nekretnina nekretnina;
 
     @Column(nullable = false)
-    private boolean active;
-
-    @Column(nullable = false)
-    private boolean accepted;
+    public boolean likeDislike;
 
 }

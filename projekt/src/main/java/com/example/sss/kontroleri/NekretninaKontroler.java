@@ -2,13 +2,10 @@ package com.example.sss.kontroleri;
 
 import com.example.sss.model.*;
 import com.example.sss.model.DTO.KorisnikDTO;
+import com.example.sss.model.DTO.LikeDTO;
 import com.example.sss.model.DTO.NekretninaDTO;
 import com.example.sss.model.DTO.TerminDTO;
-import com.example.sss.repozitorijumi.AgentRepozitorijum;
-import com.example.sss.repozitorijumi.KorisnikRepozitorijum;
-import com.example.sss.repozitorijumi.NekretninaRepozitorijum;
-import com.example.sss.repozitorijumi.TerminRepozitorijum;
-import com.example.sss.repozitorijumi.SlikaRepozitorijum;
+import com.example.sss.repozitorijumi.*;
 import com.example.sss.servisi.ImageUtils;
 import com.example.sss.servisi.KorisnikServis;
 import com.example.sss.servisi.NekretninaServis;
@@ -52,6 +49,9 @@ public class NekretninaKontroler {
     @Autowired
     SlikaRepozitorijum slikaRepozitorijum;
 
+    @Autowired
+    LikeRepozitorijum likeRepozitorijum;
+
     TokenUtils tokenUtils = new TokenUtils();
 
     ImageUtils imageUtils = new ImageUtils();
@@ -65,7 +65,8 @@ public class NekretninaKontroler {
             @RequestParam(value = "povrsina", required = false) String povrsina,
             @RequestParam(value = "cena", required = false) String cena,
             @RequestParam(value = "prodaja", required = false) String prodaja,
-            @RequestParam(value = "tip", required = false) String tip) {
+            @RequestParam(value = "tip", required = false) String tip,
+            @RequestHeader("authorization") String token) {
 
         if(lokacija == null || lokacija.isEmpty()) { lokacija = "%";}
         System.out.println(lokacija);
@@ -107,31 +108,6 @@ public class NekretninaKontroler {
             }
         }
 
-        System.out.println(lokacija + povrsina + cena + prodaja + tip);
-        List<Nekretnina> nekretnine = nekretninaRepozitorijum.filter(lokacija, povrsina, cena, prodaja, tip);
-        Collections.reverse(nekretnine);
-        List<NekretninaDTO> nekretnineDTOi = new ArrayList<>();
-
-        for (Nekretnina nekretnina : nekretnine) {
-            NekretninaDTO nekretninaDTO = new NekretninaDTO();
-            nekretninaDTO.setId(nekretnina.getId());
-            nekretninaDTO.setLokacija(nekretnina.getLokacija());
-            nekretninaDTO.setPovrsina(nekretnina.getPovrsina());
-            nekretninaDTO.setCena(nekretnina.getCena());
-            nekretninaDTO.setProdajaIzdaja(String.valueOf(nekretnina.getProdajaIzdaja()));
-            nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
-            nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
-            nekretninaDTO.setBrojPregleda(nekretnina.getBrojPregleda());
-            System.out.println(nekretninaDTO.getCena());
-            nekretnineDTOi.add(nekretninaDTO);
-        }
-
-        return ResponseEntity.ok(nekretnineDTOi);
-    }
-
-    @PostMapping("/zakazivanje")
-    public ResponseEntity<TerminDTO> zakazivanje(@RequestBody @Validated TerminDTO terminDTO, @RequestHeader("authorization") String token){
-
         for (int m = 0; m < 10; m++) {
             System.out.println("!!!!!!!!!!!!!!!!");
         }
@@ -143,45 +119,18 @@ public class NekretninaKontroler {
         catch (Exception ignored){
 
         }
+        Korisnik korisnik = null;
 
         if(email != null) {
-            Korisnik korisnik = korisnikRepozitorijum.findByEmail(email);
-
-            if (korisnik != null) {
-                if (korisnik.getRole() == enumRole.KORISNIK) {
-                    System.out.println(terminDTO.getDate());
-                    System.out.println("you face jaraxxus");
-
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(terminDTO.getDate());
-                    calendar.add(Calendar.HOUR_OF_DAY, -2);
-                    calendar.add(Calendar.MILLISECOND, +1);
-                    Date datum1 = calendar.getTime();
-                    calendar.add(Calendar.HOUR_OF_DAY, +4);
-                    calendar.add(Calendar.MILLISECOND, -2);
-                    Date datum2 = calendar.getTime();
-
-                    Termin termin = terminRepozitorijum.termin(datum1, datum2, korisnik.getId(), terminDTO.getId());
-
-                    if(termin == null) {
-                        System.out.println("you face jaraxxus");
-                        terminRepozitorijum.insert(terminDTO.getDate(), korisnik.getId(), terminDTO.getId());
-                        return new ResponseEntity<>(terminDTO, HttpStatus.CREATED);
-                    }
-                    return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
-                }
-            }
+            korisnik = korisnikRepozitorijum.findByEmail(email);
         }
 
-        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-    }
+        System.out.println(lokacija + povrsina + cena + prodaja + tip);
+        List<Nekretnina> nekretnine = nekretninaRepozitorijum.filter(lokacija, povrsina, cena, prodaja, tip);
+        Collections.reverse(nekretnine);
+        List<NekretninaDTO> nekretnineDTOi = new ArrayList<>();
 
-    @GetMapping("/{id}")
-    public ResponseEntity<NekretninaDTO> getNekrenina(@PathVariable String id) {
-
-        Nekretnina nekretnina = nekretninaRepozitorijum.findById(Integer.parseInt(id));
-
-        if(nekretnina != null) {
+        for (Nekretnina nekretnina : nekretnine) {
             NekretninaDTO nekretninaDTO = new NekretninaDTO();
             nekretninaDTO.setId(nekretnina.getId());
             nekretninaDTO.setLokacija(nekretnina.getLokacija());
@@ -228,11 +177,150 @@ public class NekretninaKontroler {
             }
 
             nekretninaDTO.setSlikeUBase64(enkodiraneSlike);
-            //System.out.println(nekretninaDTO.getSlikeUBase64());
+            if (korisnik != null) {
+                Ocena ocena = likeRepozitorijum.liked(korisnik.getId(), nekretnina.getId());
+                System.out.println(korisnik.getId() + "bruhimics" +  nekretnina.getId());
+                if (ocena != null) {
+                    System.out.println(ocena.likeDislike);
+                    nekretninaDTO.setLiked(ocena.likeDislike);
+                }
+            };
+            nekretnineDTOi.add(nekretninaDTO);
+        }
 
-            nekretninaRepozitorijum.povecajBrojPregleda(nekretnina.getId());
+        return ResponseEntity.ok(nekretnineDTOi);
+    }
 
-            return new ResponseEntity<>(nekretninaDTO, HttpStatus.OK);
+    @PostMapping("/zakazivanje")
+    public ResponseEntity<TerminDTO> zakazivanje(@RequestBody @Validated TerminDTO terminDTO, @RequestHeader("authorization") String token){
+
+        for (int m = 0; m < 10; m++) {
+            System.out.println("!!!!!!!!!!!!!!!!");
+        }
+
+        String email = null;
+        try {
+            email = tokenUtils.getClaimsFromToken(token).getSubject();
+        }
+        catch (Exception ignored){
+
+        }
+
+        if(email != null) {
+            Korisnik korisnik = korisnikRepozitorijum.findByEmail(email);
+
+            if (korisnik != null) {
+                if (korisnik.getRole() == enumRole.KORISNIK) {
+                    System.out.println(terminDTO.getDate());
+                    System.out.println("you face jaraxxus");
+                    Nekretnina nekretnina = nekretninaRepozitorijum.findById(terminDTO.getId());
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(terminDTO.getDate());
+                    calendar.add(Calendar.HOUR_OF_DAY, -2);
+                    calendar.add(Calendar.MILLISECOND, +1);
+                    Date datum1 = calendar.getTime();
+                    calendar.add(Calendar.HOUR_OF_DAY, +4);
+                    calendar.add(Calendar.MILLISECOND, -2);
+                    Date datum2 = calendar.getTime();
+
+                    if (nekretnina != null && nekretnina.isActive()) {
+                        Termin termin = terminRepozitorijum.termin(datum1, datum2, korisnik.getId(), terminDTO.getId());
+
+                        if (termin == null) {
+                            System.out.println("you face jaraxxus");
+                            terminRepozitorijum.insert(terminDTO.getDate(), korisnik.getId(), terminDTO.getId());
+                            return new ResponseEntity<>(terminDTO, HttpStatus.CREATED);
+                        }
+                    }
+                    return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+                }
+            }
+        }
+
+        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<NekretninaDTO> getNekrenina(@PathVariable String id, @RequestHeader("authorization") String token) {
+
+        String email = null;
+        try {
+            email = tokenUtils.getClaimsFromToken(token).getSubject();
+        }
+        catch (Exception ignored){
+
+        }
+        Korisnik korisnik = null;
+
+        if(email != null) {
+            korisnik = korisnikRepozitorijum.findByEmail(email);
+        }
+
+        Nekretnina nekretnina = nekretninaRepozitorijum.findById(Integer.parseInt(id));
+
+        if(nekretnina != null) {
+            if (nekretnina.isActive()) {
+                NekretninaDTO nekretninaDTO = new NekretninaDTO();
+                nekretninaDTO.setId(nekretnina.getId());
+                nekretninaDTO.setLokacija(nekretnina.getLokacija());
+                nekretninaDTO.setPovrsina(nekretnina.getPovrsina());
+                nekretninaDTO.setCena(nekretnina.getCena());
+                nekretninaDTO.setProdajaIzdaja(String.valueOf(nekretnina.getProdajaIzdaja()));
+                nekretninaDTO.setTip(String.valueOf(nekretnina.getTip()));
+                nekretninaDTO.setKorisnik(nekretnina.getKorisnik().getFirstName());
+                nekretninaDTO.setBrojPregleda(nekretnina.getBrojPregleda());
+                System.out.println(nekretninaDTO.getCena());
+
+                List<ImagePath> slikeUBase64 = slikaRepozitorijum.slikeNekretnine(nekretnina.getId());
+                for (ImagePath slika : slikeUBase64) {
+                    System.out.println(slika.getImagePath());
+                }
+                List<String> imenafajlova = slikeUBase64.stream()
+                        .map(ImagePath::getImagePath)
+                        .collect(Collectors.toList());
+                for (String slika : imenafajlova) {
+                    System.out.println(slika);
+                }
+
+                List<String> potpuneputanje = new ArrayList<>();
+                for (String slika : imenafajlova) {
+                    potpuneputanje.add(putanja + slika);
+                }
+
+                for (String slika : potpuneputanje) {
+                    System.out.println(slika);
+                }
+
+                List<String> enkodiraneSlike = new ArrayList<>();
+                for (String slika : potpuneputanje) {
+                    File putanja = new File(slika);
+                    try {
+                        byte[] imageData = Files.readAllBytes(putanja.toPath());
+                        String base64Slika = Base64.getEncoder().encodeToString(imageData);
+                        enkodiraneSlike.add(base64Slika);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                nekretninaDTO.setSlikeUBase64(enkodiraneSlike);
+                //System.out.println(nekretninaDTO.getSlikeUBase64());
+
+                if (korisnik != null) {
+                    Ocena ocena = likeRepozitorijum.liked(korisnik.getId(), nekretnina.getId());
+                    System.out.println(korisnik.getId() + "bruhimics" +  nekretnina.getId());
+                    if (ocena != null) {
+                        System.out.println(ocena.likeDislike);
+                        nekretninaDTO.setLiked(ocena.likeDislike);
+                    }
+                };
+
+                nekretninaRepozitorijum.povecajBrojPregleda(nekretnina.getId());
+
+                return new ResponseEntity<>(nekretninaDTO, HttpStatus.OK);
+            }
         }
 
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -371,5 +459,113 @@ public class NekretninaKontroler {
         }
 
         return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+    }
+
+    @PostMapping("/like")
+    public ResponseEntity<List<NekretninaDTO>> like(@RequestBody @Validated LikeDTO likeDTO, @RequestHeader("authorization") String token) {
+
+        for (int m = 0; m < 10; m++) {
+            System.out.println("!!!!!!!!!!!!!!!!");
+        }
+
+        String email = null;
+        try {
+            email = tokenUtils.getClaimsFromToken(token).getSubject();
+        } catch (Exception ignored) {
+
+        }
+
+        if (email != null) {
+            Korisnik korisnik = korisnikRepozitorijum.findByEmail(email);
+
+            if (korisnik != null) {
+                if (korisnik.getRole() == enumRole.KORISNIK) {
+                    Nekretnina nekretnina = nekretninaRepozitorijum.findById(likeDTO.nekretninaId);
+
+                    if (nekretnina != null) {
+                        Ocena ocena = likeRepozitorijum.liked(korisnik.getId(), likeDTO.nekretninaId);
+                        System.out.println("ukakicu se");
+                        System.out.println(korisnik.getId() + "niger" +  likeDTO.nekretninaId);
+
+                        if (ocena == null) {
+                            likeRepozitorijum.insert(likeDTO.like, korisnik.getId(), likeDTO.nekretninaId);
+                            return new ResponseEntity<>(null, HttpStatus.OK);
+                        }
+                    }
+
+                    return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+                }
+            }
+        }
+
+        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping("/mojitermini")
+    public ResponseEntity<List<TerminDTO>> getMojiTermini(@RequestHeader("authorization") String token) {
+
+        for (int m = 0; m < 10; m++) {
+            System.out.println("!!!!!!!!!!!!!!!!");
+        }
+
+        String email = null;
+        try {
+            email = tokenUtils.getClaimsFromToken(token).getSubject();
+        } catch (Exception ignored) {
+
+        }
+
+        if (email != null) {
+            Korisnik korisnik = korisnikRepozitorijum.findByEmail(email);
+
+            if (korisnik != null) {
+                if (korisnik.getRole() == enumRole.AGENT || korisnik.getRole() == enumRole.VLASNIK) {
+                    List<Nekretnina> nekretnine = nekretninaRepozitorijum.nekretnineAgenta(korisnik.getId());
+
+                    List<Integer> ids = nekretnine.stream()
+                            .map(Nekretnina::getId)
+                            .collect(Collectors.toList());
+                    List<Termin> termini = terminRepozitorijum.terminiAgenta(ids);
+                    List<TerminDTO> terminDTOi = new ArrayList<>();
+                    for (Termin termin : termini) {
+                        TerminDTO terminDTO = new TerminDTO();
+                        terminDTO.setIdTermina(termin.getId());
+                        terminDTO.setDate(termin.getDatum());
+                        terminDTO.setId(termin.getNekretnina().getId());
+                        terminDTOi.add(terminDTO);
+                    }
+
+                    return ResponseEntity.ok(terminDTOi);
+                }
+            }
+        }
+
+        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping("/prihvatizahtev")
+    public ResponseEntity<TerminDTO> prihvatiZahtev(@RequestBody @Validated TerminDTO terminDTO, @RequestHeader("authorization") String token) {
+
+        for (int m = 0; m < 10; m++) {
+            System.out.println("!!!!!!!!!!!!!!!!");
+        }
+
+        String email = null;
+        try {
+            email = tokenUtils.getClaimsFromToken(token).getSubject();
+        } catch (Exception ignored) {
+
+        }
+
+        if (email != null) {
+            Korisnik korisnik = korisnikRepozitorijum.findByEmail(email);
+
+            if (korisnik != null) {
+                if (korisnik.getRole() == enumRole.AGENT || korisnik.getRole() == enumRole.VLASNIK) {
+                    Termin termin = terminRepozitorijum.nadji(terminDTO.getIdTermina());
+                }
+            }
+        }
+        return null;
     }
 }
