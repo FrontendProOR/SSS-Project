@@ -18,7 +18,7 @@ import java.util.List;
 public interface TerminRepozitorijum extends JpaRepository<Termin, Long> {
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO termini (datum, korisnik_id, nekretnina_id, active) VALUES (:datum, :korisnik_id, :nekretnina_id, true)", nativeQuery = true)
+    @Query(value = "INSERT INTO termini (datum, korisnik_id, nekretnina_id, active, accepted) VALUES (:datum, :korisnik_id, :nekretnina_id, true, false)", nativeQuery = true)
     int insert(@Param("datum") Date datum, @Param("korisnik_id") int korisnik_id, @Param("nekretnina_id") int nekretnina_id);
 
     @Query(value = "SELECT * FROM termini WHERE (korisnik_id = :korisnik_id AND nekretnina_id = :nekretnina_id AND active = true) OR (datum BETWEEN :datum1 AND :datum2 AND nekretnina_id = :nekretnina_id AND active = true) LIMIT 1;", nativeQuery = true)
@@ -27,6 +27,47 @@ public interface TerminRepozitorijum extends JpaRepository<Termin, Long> {
     @Query(value ="SELECT * FROM termini WHERE nekretnina_id IN :ids AND active = true", nativeQuery = true)
     List<Termin> terminiAgenta(@Param("ids") List<Integer> ids);
 
+    @Query(value ="SELECT * FROM termini WHERE nekretnina_id IN :ids AND zavrsen = true", nativeQuery = true)
+    List<Termin> zavrseniTerminiAgenta(@Param("ids") List<Integer> ids);
+
+    @Query(value ="SELECT * FROM termini WHERE nekretnina_id = :id AND active = true", nativeQuery = true)
+    List<Termin> terminiNekretnine(@Param("id") int id);
+
     @Query(value ="SELECT * FROM termini WHERE id = :id AND active = true LIMIT 1", nativeQuery = true)
     Termin nadji(@Param("id") int id);
+
+    @Query(value ="SELECT * FROM termini WHERE id = :id", nativeQuery = true)
+    Termin nadjiBiloKojiTermin(@Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE termini SET accepted = true WHERE id = :id", nativeQuery = true)
+    void prihvati(@Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE termini SET active = false WHERE id = :id", nativeQuery = true)
+    void odbij(@Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE termini SET zavrsen = true WHERE id = :id", nativeQuery = true)
+    void zavrsi(@Param("id") int id);
+
+    @Query(value ="SELECT * FROM termini WHERE korisnik_id = :id AND active = true", nativeQuery = true)
+    List<Termin> mojiTermini(@Param("id") int id);
+
+    @Query(value ="SELECT * FROM termini WHERE korisnik_id = :id AND zavrsen = true", nativeQuery = true)
+    List<Termin> mojiZavrseniTermini(@Param("id") int id);
+
+    @Query(value ="SELECT COUNT(*) FROM termini WHERE nekretnina_id = :id AND (active = true OR zavrsen = true)", nativeQuery = true)
+    int izbrojTermineZaNekretninu(@Param("id") int id);
+
+    @Query(value ="SELECT COUNT(*) FROM termini WHERE nekretnina_id = :id AND active = true", nativeQuery = true)
+    int izbrojTermineZaPopularnost(@Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE termini SET active = false WHERE nekretnina_id = :id", nativeQuery = true)
+    void obrisiSveTermine(@Param("id") int id);
 }

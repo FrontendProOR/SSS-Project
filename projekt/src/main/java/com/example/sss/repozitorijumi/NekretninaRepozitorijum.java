@@ -40,4 +40,20 @@ public interface NekretninaRepozitorijum extends JpaRepository<Nekretnina, Long>
 
     @Query(value ="SELECT * FROM nekretnine WHERE korisnik_id = :id AND active = true", nativeQuery = true)
     List<Nekretnina> nekretnineAgenta(@Param("id") int id);
+
+    @Query(value ="SELECT * FROM nekretnine WHERE korisnik_id = :id", nativeQuery = true)
+    List<Nekretnina> sveNekretnineAgenta(@Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE nekretnine SET active = false WHERE id = :id", nativeQuery = true)
+    void obrisi(@Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE nekretnine SET cena = :cena, prodaja_izdaja = :prodaja WHERE id = :id", nativeQuery = true)
+    void izmeni(@Param("cena") double cena, @Param("prodaja") String prodaja, @Param("id") int id);
+
+    @Query(value ="SELECT * FROM nekretnine WHERE korisnik_id = :kid AND nekretnina_id = :nid", nativeQuery = true)
+    Nekretnina odrediVlasnistvo(@Param("kid") int kid, @Param("nid") int nid);
 }

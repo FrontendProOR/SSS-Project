@@ -16,4 +16,6 @@ public class TerminDTO {
     private Integer idTermina;
     private Date date;
     private Integer id;
+    private Boolean accepted;
+    private Boolean zavrsen;
 }
