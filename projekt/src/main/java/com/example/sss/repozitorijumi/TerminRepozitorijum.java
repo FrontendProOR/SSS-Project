@@ -18,7 +18,7 @@ import java.util.List;
 public interface TerminRepozitorijum extends JpaRepository<Termin, Long> {
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO termini (datum, korisnik_id, nekretnina_id, active, accepted) VALUES (:datum, :korisnik_id, :nekretnina_id, true, false)", nativeQuery = true)
+    @Query(value = "INSERT INTO termini (datum, korisnik_id, nekretnina_id, active, accepted, zavrsen, vidjen) VALUES (:datum, :korisnik_id, :nekretnina_id, true, false, false, false)", nativeQuery = true)
     int insert(@Param("datum") Date datum, @Param("korisnik_id") int korisnik_id, @Param("nekretnina_id") int nekretnina_id);
 
     @Query(value = "SELECT * FROM termini WHERE (korisnik_id = :korisnik_id AND nekretnina_id = :nekretnina_id AND active = true) OR (datum BETWEEN :datum1 AND :datum2 AND nekretnina_id = :nekretnina_id AND active = true) LIMIT 1;", nativeQuery = true)
@@ -70,4 +70,9 @@ public interface TerminRepozitorijum extends JpaRepository<Termin, Long> {
     @Transactional
     @Query(value = "UPDATE termini SET active = false WHERE nekretnina_id = :id", nativeQuery = true)
     void obrisiSveTermine(@Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE termini SET vidjen = true WHERE id = :id", nativeQuery = true)
+    void vidi(@Param("id") int id);
 }

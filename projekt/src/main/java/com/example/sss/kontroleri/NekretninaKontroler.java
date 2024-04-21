@@ -69,8 +69,10 @@ public class NekretninaKontroler {
     @GetMapping("/pretraga")
     public ResponseEntity<List<NekretninaDTO>> pretraga(
             @RequestParam(value = "lokacija", required = false) String lokacija,
-            @RequestParam(value = "povrsina", required = false) String povrsina,
-            @RequestParam(value = "cena", required = false) String cena,
+            @RequestParam(value = "povrsinamin", required = false) String povrsinamin,
+            @RequestParam(value = "povrsinamax", required = false) String povrsinamax,
+            @RequestParam(value = "cenamin", required = false) String cenamin,
+            @RequestParam(value = "cenamax", required = false) String cenamax,
             @RequestParam(value = "prodaja", required = false) String prodaja,
             @RequestParam(value = "tip", required = false) String tip,
             @RequestHeader("authorization") String token) {
@@ -78,22 +80,41 @@ public class NekretninaKontroler {
         if(lokacija == null || lokacija.isEmpty()) { lokacija = "%";}
         System.out.println(lokacija);
 
-        if(povrsina == null || povrsina.isEmpty()) { povrsina = "%";}
+        if(povrsinamin == null || povrsinamin.isEmpty()) { povrsinamin = "0";}
         else {
             try {
-                Double.parseDouble(povrsina);
+                Double.parseDouble(povrsinamin);
             } catch (NumberFormatException e) {
-                povrsina = "%";
+                povrsinamin = "0";
             }
         }
-        System.out.println(povrsina);
+        System.out.println(povrsinamin);
 
-        if(cena == null || cena.isEmpty()) { cena = "%";}
+        if(povrsinamax == null || povrsinamax.isEmpty()) { povrsinamax = "2147483647";}
         else {
             try {
-                Double.parseDouble(cena);
+                Double.parseDouble(povrsinamax);
             } catch (NumberFormatException e) {
-                cena = "%";
+                povrsinamax = "2147483647";
+            }
+        }
+        System.out.println(povrsinamax);
+
+        if(cenamin == null || cenamin.isEmpty()) { cenamin = "0";}
+        else {
+            try {
+                Double.parseDouble(cenamin);
+            } catch (NumberFormatException e) {
+                cenamin = "0";
+            }
+        }
+
+        if(cenamax == null || cenamax.isEmpty()) { cenamax = "2147483647";}
+        else {
+            try {
+                Double.parseDouble(cenamax);
+            } catch (NumberFormatException e) {
+                cenamax = "2147483647";
             }
         }
 
@@ -132,8 +153,8 @@ public class NekretninaKontroler {
             korisnik = korisnikRepozitorijum.findByEmail(email);
         }
 
-        System.out.println(lokacija + povrsina + cena + prodaja + tip);
-        List<Nekretnina> nekretnine = nekretninaRepozitorijum.filter(lokacija, povrsina, cena, prodaja, tip);
+        System.out.println(lokacija + povrsinamin + povrsinamax + cenamin + cenamax + prodaja + tip);
+        List<Nekretnina> nekretnine = nekretninaRepozitorijum.filter(lokacija, povrsinamin, povrsinamax, cenamin, cenamax, prodaja, tip);
         Collections.reverse(nekretnine);
         List<NekretninaDTO> nekretnineDTOi = new ArrayList<>();
 
@@ -583,6 +604,10 @@ public class NekretninaKontroler {
                         terminDTO.setDate(termin.getDatum());
                         terminDTO.setId(termin.getNekretnina().getId());
                         terminDTO.setAccepted(termin.isAccepted());
+                        terminDTO.setVidjen(termin.isVidjen());
+                        if (!termin.isVidjen()) {
+                            terminRepozitorijum.vidi(termin.getId());
+                        }
                         terminDTOi.add(terminDTO);
                     }
 
