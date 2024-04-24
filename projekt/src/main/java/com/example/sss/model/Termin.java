@@ -38,4 +38,7 @@ public class Termin {
     @Column(nullable = false)
     private boolean zavrsen;
 
+    @Column(nullable = false)
+    private boolean vidjen;
+
 }

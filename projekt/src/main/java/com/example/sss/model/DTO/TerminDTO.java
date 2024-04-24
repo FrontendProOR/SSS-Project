@@ -18,4 +18,5 @@ public class TerminDTO {
     private Integer id;
     private Boolean accepted;
     private Boolean zavrsen;
+    private Boolean vidjen;
 }

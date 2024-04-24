@@ -18,9 +18,9 @@ public interface NekretninaRepozitorijum extends JpaRepository<Nekretnina, Long>
 
     Nekretnina findById (int id);
 
-    @Query(value = "SELECT * FROM nekretnine WHERE lokacija LIKE :lokacija AND povrsina LIKE :povrsina AND cena LIKE :cena AND prodaja_izdaja LIKE :prodaja AND tip LIKE :tip AND active = true", nativeQuery = true)
-    List<Nekretnina> filter(@Param("lokacija") String lokacija, @Param("povrsina") String povrsina,
-                            @Param("cena") String cena, @Param("prodaja") String prodaja, @Param("tip") String tip);
+    @Query(value = "SELECT * FROM nekretnine WHERE lokacija LIKE :lokacija AND povrsina BETWEEN :povrsinamin AND :povrsinamax AND cena BETWEEN :cenamin AND :cenamax AND prodaja_izdaja LIKE :prodaja AND tip LIKE :tip AND active = true", nativeQuery = true)
+    List<Nekretnina> filter(@Param("lokacija") String lokacija, @Param("povrsinamin") String povrsinamin, @Param("povrsinamax") String povrsinamax,
+                            @Param("cenamin") String cenamin, @Param("cenamax") String cenamax, @Param("prodaja") String prodaja, @Param("tip") String tip);
 
     @Query(value ="SELECT * FROM nekretnine WHERE korisnik_id IN :ids AND active = true", nativeQuery = true)
     List<Nekretnina> nekretnineAgencije(@Param("ids") List<Integer> ids);
